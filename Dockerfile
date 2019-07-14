@@ -25,5 +25,5 @@ COPY scripts/ scripts/
 COPY src/ src/
 COPY logs/ logs/
 
-# ENTRYPOINT ["bash ./scripts/wait-for-it.sh"]
+ENTRYPOINT ["bash ./scripts/wait-for-it.sh"]
 

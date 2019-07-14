@@ -1,5 +1,11 @@
 version: '3.7'
 
+networks:
+  default:
+    external:
+      name: whirlpool-net
+
+
 services:
 
   whirlpool-parse:
@@ -17,7 +23,7 @@ services:
     container_name: whirlpool-rmq
     hostname: whirlpool-rmq
     restart: on-failure
-    image: whirlpool-rmq:latest
+    image: rihbyne/whirlpool-rmq:latest
     ports:
       - "5672:5672"
       - "8080:15672"
