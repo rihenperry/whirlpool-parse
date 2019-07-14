@@ -1,0 +1,12 @@
+.git/
+.github/
+config/*
+!config/config.json
+!config/config.json.ctmpl
+lib/
+node_modules/
+.editorconfig
+.gitignore
+.gitmodules
+LICENSE
+README.md

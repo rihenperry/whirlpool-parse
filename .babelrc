@@ -1,0 +1,22 @@
+{
+  "plugins": [
+    "lodash",
+    "transform-es2015-modules-commonjs",
+    "transform-object-rest-spread",
+    "transform-class-properties",
+    "array-includes",
+    [
+      "transform-runtime", {
+        "polyfill": false,
+        "regenerator": true
+      }
+    ]
+  ],
+  "presets": [
+    ["env", {
+      "targets": {
+        "node": "current"
+      }
+    }]
+  ]
+}
