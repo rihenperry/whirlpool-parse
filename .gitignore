@@ -3,6 +3,7 @@
 # Project-specific files and directories
 /lib
 /config/config.json
+prod-docker-compose.yml
 
 ### Node ###
 # Logs

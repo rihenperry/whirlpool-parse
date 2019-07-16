@@ -14,16 +14,5 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile
-      target: whirlpool-parse
+      target: whirlpool-parse-dev
     restart: on-failure
-    depends_on:
-      - whirlpool-rmq
-
-  whirlpool-rmq:
-    container_name: whirlpool-rmq
-    hostname: whirlpool-rmq
-    restart: on-failure
-    image: rihbyne/whirlpool-rmq:latest
-    ports:
-      - "5672:5672"
-      - "8080:15672"
