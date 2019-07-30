@@ -16,20 +16,24 @@ export const parserConsume = async function ({connection, consumeChannel, publis
 			// publish to next exchange in the chain for further processing
 			// publish, ack method do not return a promise
 			try {
-        // publish to content seen q
+        // publish to content seen q. stick to the format below
         data = {
-          "message_id": 1,
-          "filename": "something.html",
-          "document_id": "qwerty123"
+          "url": "http://indeed.com/something",
+          "doc_id": "qwerty123",
+          "domain": "http://indeed.com",
+          "type": "c_or_nc"
         };
 				const csAckPublish = await publish(publishChannel, data);
 				logger.log('info', 'parser_p published results of work done by parser_c to contentseen_c',
                    csAckPublish);
 
 
-        // publish to urlfilter q
+        // publish to urlfilter q. stick to the format below
         data = {
-          "extract_url": "/labamba.html"
+          "domain": "http://ex1.com",
+          "1": [{"url": "abc?max=", "type": "nc"}, {"type": "c", "url": "/hola"}],
+          "2": [{"url": "http://ex4.com/new", "type": "nc"}, {"type": "c", "url": "http://ex10.com"}],
+          "3": [{"url": "http://ex3.com/xyz/def", "type": "nc"}, {"type": "c", "url": "http://ex7.com"}]
         };
 
         const urlfilterAckPublish = await publish(publishChannel, data, 'parser_p.to.urlfilter_c',
