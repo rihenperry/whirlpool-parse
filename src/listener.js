@@ -22,13 +22,14 @@ import config from './helpers/config';
 import {parserConsume as consume} from './consumer';
 import logger from './helpers/applogging';
 
+const log = logger(module);
 
 async function listenForMessagesFromFetchPublisher() {
 	// connect to RabbitMQ Instance
-	logger.log('info', 'rabbitmq config %s', JSON.stringify(config.rabbitmq));
+	log.info('rabbitmq config %s', JSON.stringify(config.rabbitmq));
 	const connection = await amqp.connect(config.rabbitmq);
 
-	logger.log('info', 'authenticated to rabbitmq host %s, vhost %s as user %s',
+	log.info('authenticated to rabbitmq host %s, vhost %s as user %s',
 		config.rabbitmq.hostname,
 		config.rabbitmq.vhost,
 		config.rabbitmq.username);
@@ -36,7 +37,7 @@ async function listenForMessagesFromFetchPublisher() {
 	// create consumer channel and prefetch 1 message at a time
 	const consumeChannel = await connection.createChannel();
 	await consumeChannel.prefetch(1);
-	logger.log('info', 'listening with prefetch 1 message at a time');
+	log.info('listening with prefetch 1 message at a time');
 
 	// create publisher channel to send work produce to parser consumer via
 	// fetch publisher
@@ -44,10 +45,10 @@ async function listenForMessagesFromFetchPublisher() {
 	let ansConsume;
 	try {
 		ansConsume = await consume({connection, consumeChannel, publishChannel});
-		logger.log('info', ansConsume);
+		log.info(ansConsume);
 	}
 	catch (except) {
-		logger.log('error', 'consume function ', except);
+		log.error('consume function ', except);
 	}
 }
 

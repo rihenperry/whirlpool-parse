@@ -1,5 +1,6 @@
 import logger from './helpers/applogging';
 
+const log = logger(module);
 
 export function parserPublish(channel, data = null, routingKey = 'parser_p.to.contentseen_c',
 	exchangeName = 'parser.ex.contentseen') {
@@ -12,11 +13,11 @@ export function parserPublish(channel, data = null, routingKey = 'parser_p.to.co
 			{persistent: true},
 			(err, ok) => {
 				if (err) {
-					logger.log('error', 'parser publish malformed ', err);
+					log.error('parser publish malformed ', err);
 					return reject(err);
 				}
 
-				logger.log('info', 'parser publish messaged acknowledged', ok);
+				log.info('parser publish messaged acknowledged', ok);
 				return resolve(true);
 			});
 	});

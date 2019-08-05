@@ -17,37 +17,61 @@
  */
 
 import path from 'path';
+import winston from 'winston';
 
+const {format} = require('winston');
+const PROJECT_ROOT = path.join(__dirname, '..');
+const LOG_DIR = path.join(PROJECT_ROOT, '..')
 
-const {createLogger, config, format, transports} = require('winston');
+const options = {
+  file: {
+    level: 'error',
+    filename: `${LOG_DIR}/logs/rotating.log`,
+    handleExceptions: true,
+    json: false,
+    maxsize: 5242880, // 5MB
+    maxFiles: 10,
+    colorize: false,
+    timestamp: true
+  },
+  console: {
+    level: 'debug',
+    handleExceptions: true,
+    colorize: true,
+    timestamp: true
+  }
+};
 
-
-const {combine, splat, timestamp, colorize, simple} = format;
-
-const DailyRotateFile = require('winston-daily-rotate-file');
-
-
-const filename = 'whirlpool-parse-%DATE%.log';
-
-const logger = createLogger({
-	levels: config.syslog.levels,
-	format: combine(
-		splat(),
-		timestamp(),
-		colorize(),
-		simple()
-	),
-	transports: [
-		new transports.Console(),
-		new DailyRotateFile({
-			name: filename,
-			datePattern: 'YYYY-MM-DD-HH',
-			filename: path.join(__dirname, '../logs', filename)
-		})
-	],
-	exitOnError: false
+const customFormat = format.printf(({ level, message, label, timestamp }) => {
+  return `${timestamp} - [${level}]: ${message} - (${label})`;
 });
 
-logger.log('info', 'winston logging configured and effective');
+const getCustomLabel = (callingModule) => {
+  var parts = callingModule.filename.split('/');
+  return parts[parts.length - 2] + '/' + parts.pop();
+};
 
-export default logger;
+const log = function(callingModule) {
+  return winston.createLogger({
+    format: format.combine(
+      format.colorize(),
+      format.splat(),
+      format.simple(),
+      format.label({ label: getCustomLabel(callingModule) }),
+      format.timestamp(),
+      customFormat
+    ),
+    transports: [
+      new winston.transports.File(options.file),
+      new winston.transports.Console(options.console)
+    ],
+    exitOnError: false
+  });
+};
+
+const mylog = log(module);
+mylog.debug("PROJECT ROOT=%s", PROJECT_ROOT);
+mylog.debug("LOG_DIR=%s", LOG_DIR);
+mylog.info('winston logging configured and effective');
+
+export default log;

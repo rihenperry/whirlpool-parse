@@ -1,0 +1,34 @@
+version: '2.4'
+
+networks:
+  default:
+    external:
+      name: whirlpool-net
+
+services:
+
+  base:
+    image: node:10.16.0
+    command: bash -c "useradd --create-home --shell /bin/bash whirlpool && chown -R whirlpool:whirlpool /home/whirlpool/whirlpool-parse"
+    volumes:
+      - .:/home/whirlpool/whirlpool-parse
+      - wh-parse:/home/whirlpool/whirlpool-parse/node_modules
+    working_dir: /home/whirlpool/whirlpool-parse
+    environment:
+      - PY_ENV=development
+    networks:
+      - default
+
+  install:
+    extends:
+      service: base
+    command: npm install --no-audit
+
+  quick-up:
+    extends:
+      service: base
+    command: npm start
+
+volumes:
+  wh-parse:
+    external: true
