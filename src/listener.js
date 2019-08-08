@@ -25,6 +25,7 @@ import logger from './helpers/applogging';
 const log = logger(module);
 
 async function listenForMessagesFromFetchPublisher() {
+  // connect to mongodb using env only
 	// connect to RabbitMQ Instance
 	log.info('rabbitmq config %s', JSON.stringify(config.rabbitmq));
 	const connection = await amqp.connect(config.rabbitmq);
