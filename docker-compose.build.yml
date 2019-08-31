@@ -15,7 +15,7 @@ services:
       - wh-parse:/home/whirlpool/whirlpool-parse/node_modules
     working_dir: /home/whirlpool/whirlpool-parse
     environment:
-      - PY_ENV=development
+      - NODE_ENV=development
     networks:
       - default
 

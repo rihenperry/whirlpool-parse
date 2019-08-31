@@ -44,10 +44,11 @@
     "amqplib": "^0.5.3",
     "bluebird": "^3.5.5",
     "lodash": "^4.17.14",
-    "mongoose": "^5.6.4",
+    "mongoose": "5.6.10",
     "sequelize": "^5.10.0",
     "winston": "^3.2.1",
-    "winston-daily-rotate-file": "^3.9.0"
+    "winston-daily-rotate-file": "^3.9.0",
+    "migrate": "1.6.2"
   },
   "devDependencies": {
     "cross-env": "^5.2.0",

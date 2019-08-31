@@ -17,38 +17,35 @@
  */
 /* eslint global-require: 'warn' */
 
-import amqp from 'amqplib';
-import config from './helpers/config';
+
+import {authMongoDB, authRMQ} from './helpers/config.js';
 import {parserConsume as consume} from './consumer';
 import logger from './helpers/applogging';
 
+import amqp from 'amqplib';
 const log = logger(module);
 
 async function listenForMessagesFromFetchPublisher() {
-  // connect to mongodb using env only
-	// connect to RabbitMQ Instance
-	log.info('rabbitmq config %s', JSON.stringify(config.rabbitmq));
-	const connection = await amqp.connect(config.rabbitmq);
+  try {
+    // connect to mongodb using env only
+    await authMongoDB();
 
-	log.info('authenticated to rabbitmq host %s, vhost %s as user %s',
-		config.rabbitmq.hostname,
-		config.rabbitmq.vhost,
-		config.rabbitmq.username);
+	  // connect to RabbitMQ Instance
+    let rmqConn = await authRMQ();
 
-	// create consumer channel and prefetch 1 message at a time
-	const consumeChannel = await connection.createChannel();
-	await consumeChannel.prefetch(1);
-	log.info('listening with prefetch 1 message at a time');
+	  // create consumer channel and prefetch 1 message at a time
+	  const consumeChannel = await rmqConn.createChannel();
+	  await consumeChannel.prefetch(1);
+	  log.info('listening with prefetch 1 message at a time');
 
-	// create publisher channel to send work produce to parser consumer via
-	// fetch publisher
-	const publishChannel = await connection.createConfirmChannel();
-	let ansConsume;
-	try {
-		ansConsume = await consume({connection, consumeChannel, publishChannel});
+	  // create publisher channel to send work produce to parser consumer via
+	  // fetch publisher
+	  const publishChannel = await rmqConn.createConfirmChannel();
+	  let ansConsume;
+
+		ansConsume = await consume({rmqConn, consumeChannel, publishChannel});
 		log.info(ansConsume);
-	}
-	catch (except) {
+	} catch (except) {
 		log.error('consume function ', except);
 	}
 }
