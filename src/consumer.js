@@ -1,4 +1,5 @@
 import util from 'util';
+const _ = require('lodash');
 import mongoose from 'mongoose';
 //const fs = require('fs');
 import path from 'path';
@@ -33,27 +34,39 @@ export const parserConsume = async function ({rmqConn, consumeChannel, publishCh
           try {
             const webparser = new DocParser(page.domain, page._id, page.html);
             const hrefs = await webparser.parseHTML();
-            log.info('%d hrefs extracted', hrefs.length);
+            let c = 0;
 
-            // publish to next exchange in the chain for further processing
-			      // publish, ack method do not return a promise
-            // publish to content seen q. stick to the format below
-            const csAckPublish = await publish(publishChannel,
-                                               pgFromQ);
-				    log.info('parser_p published results of work done by parser_c to contentseen_c',
-                     csAckPublish);
+            if (hrefs !== null) {
+              // publish to next exchange in the chain for further processing
+			        // publish, ack method do not return a promise
+              // publish to content seen q. stick to the format below
 
+              if (!_.isEmpty(hrefs)) {
+                _.each(hrefs, (v, k) => {
+                  if (!_.isEmpty(hrefs[k])) {
+                    c += hrefs[k].length;
+                  }
+                });
 
-            // publish to urlfilter q. stick to the format below
-            const urlfilterAckPublish = await publish(publishChannel,
-                                                      hrefs,
-                                                      'parser_p.to.urlfilter_c',
-                                                      'parser.ex.contentseen');
-				    log.info('parser_p published results of work done by parser_c to urlfilter_c',
-                     urlfilterAckPublish);
+                // publish to urlfilter q. stick to the format below
+                const urlfilterAckPublish = await publish(publishChannel,
+                                                          hrefs,
+                                                          'parser_p.to.urlfilter_c',
+                                                          'parser.ex.contentseen');
+				        log.info('parser_p published results of work done by parser_c to urlfilter_c',
+                         urlfilterAckPublish);
+              } //end of inner if
+
+              const csAckPublish = await publish(publishChannel,
+                                                 pgFromQ);
+				      log.info('parser_p published results of work done by parser_c to contentseen_c',
+                       csAckPublish);
+            } //end of outer if
 
             // finally acknowledge and drop the current message from parser q.
 				    await consumeChannel.ack(msg);
+
+            log.info('%d hrefs extracted', c);
 				    log.info('consumer msg acknowledged of work done by parser_c');
 
 				    resolve('processed single message with durable confirmation');

@@ -41,7 +41,16 @@ class DiceParser {
       },
       ($) => {
         return new Promise((resolve, reject) => {
-          let matchTest = [false];
+          let matchTest = [];
+          matchTest.push($('#search-results-control').hasClass('row'));
+          matchTest.push($('#serp').children().first().attr('type') === 'text/javascript');
+          //matchTest.push($('#serp').children().filter($('.complete-serp-result-div')).length === 20);
+          matchTest.push($('#resultSec .jobs-page-header .row div.hidden-xs.hidden-sm.col-md-6.col-lg-6.mT10')
+                         .children().first().hasClass('pagination'));
+          matchTest.push($('#serp').children().filter($('.complete-serp-result-div'))
+                         .first().hasClass('complete-serp-result-div'));
+          matchTest.push($('#serp').children().filter($('.complete-serp-result-div'))
+                         .last().hasClass('complete-serp-result-div'));
 
           log.info('mtitle %s', matchTest);
           resolve({
@@ -52,7 +61,15 @@ class DiceParser {
       },
       ($) => {
         return new Promise((resolve, reject) => {
-          let matchTest = [false];
+          let matchTest = [];
+
+          matchTest.push($('#jt').hasClass('jobTitle'));
+          matchTest.push($('#jt').next().hasClass('list-inline'));
+          matchTest.push($('#jt').next().children().first().children().first().hasClass('dice-btn-link'));
+          matchTest.push($('#bd').hasClass('job-details'));
+          matchTest.push($('#jobdescSec').hasClass('highlight-black'));
+
+          //content-seen extract need to handle data-cleansing of this page.
 
           log.info('mjob %s', matchTest);
           resolve({
@@ -70,7 +87,11 @@ class DiceParser {
     let s = {
       'mbrowse':($) => {
         return new Promise((resolve, reject) => {
-          let jobhrefs = [];
+          let jobhrefs = {};
+
+          for (let i=1; i <= parseInt(process.env.CRAWL_ORDER_MAX_LIM); i ++) {
+            jobhrefs[i] = [];
+          }
           const jobtitles = $('.container .mT10 .mTB10').children();
 
           jobtitles.splice(0,1);
@@ -78,8 +99,10 @@ class DiceParser {
             let mbtm = $(elm).children();
 
             mbtm.each((j, subelm) => {
+              //randomly assign rank function
+              let url_rank = Math.ceil(Math.random() * parseInt(process.env.CRAWL_ORDER_MAX_LIM));
               let href = $(subelm).children().first().attr('href');
-              jobhrefs.push(href);
+              jobhrefs[url_rank].push({'href': href, 'type': 'c'});
             });
           });
 
@@ -87,10 +110,41 @@ class DiceParser {
         });
       },
       'mtitle': ($) => {
-        return [];
+        return new Promise((resolve, reject) => {
+          let jobOpeningHrefs = {};
+
+          for (let i=1; i <= 2; i ++) {
+            jobOpeningHrefs[i] = [];
+          }
+
+          const jobopenings = $('#serp').children().filter($('.complete-serp-result-div')).length;
+          const pagination = $('#resultSec .jobs-page-header .row div.hidden-xs.hidden-sm.col-md-6.col-lg-6.mT10')
+                .children().first().children().last().children();
+
+          pagination.each((i, e) => {
+            jobOpeningHrefs[2].push({'href': $(e).children().attr('href'), 'type': 'c'});
+          });
+
+          for (let i=0; i<jobopenings; i++) {
+            let id = '#position'.concat(i);
+            let url_rank = Math.ceil(Math.random() * 2);
+            let href = $(id).attr('href');
+            jobOpeningHrefs[url_rank].push({'href': href, 'type': 'nc'});
+          }
+
+          resolve(jobOpeningHrefs);
+        });
       },
-      'mtitle': ($) => {
-        return [];
+      'mjob': ($) => {
+        return new Promise((resolve, reject) => {
+          let comHrefs = {'5': []};
+
+          let obj = {'href': $('#jt').next().children().first().children().first().attr('href'),
+                     type: 'nc'};
+          comHrefs['5'].push(obj);
+
+          resolve(comHrefs);
+        });
       }
     };
 
@@ -114,33 +168,43 @@ class DiceParser {
   async isMatch() {
     return new Promise((resolve, reject) => {
       let m = false;
+      let breakop = {break: null, e: null};
+
       log.debug('matching %s <-> %s', DiceParser._domain, this._doc_id);
 
       async.each(DiceParser._pSet, (f, cb) => {
-        //let result = await f(this._page); //check for match in p set
 
         f(this._page).then((result) => {
           if (result.ans) {
             this.pMatch = result.template;
-            log.info('matched pair skeleton %s, result %s, doc id %s',
+            log.info('domain %s, matched pair skeleton %s, result %s, doc id %s',
+                     DiceParser._domain,
                      result.template,
                      result.ans,
                      this._doc_id);
-            cb({break: result.ans});
+            breakop.break = result.ans;
+            cb(breakop);
           } else {
-            log.debug('unmatched pair skeleton %s, doc id %s', result.template, this._doc_id);
+            log.debug('domain %s, unmatched pair skeleton %s, doc id %s',
+                      DiceParser._domain,
+                      result.template,
+                      this._doc_id);
             cb();
           }
         });
       }, (err) => {
-        if (err.break) {
-          log.info('async foreach break');
+        if (err && err.break !== null) {
+          log.info('domain %s, async foreach break', DiceParser._domain);
           return resolve(err.break);
-        } else if (err.e) {
-          log.error('async foreach error %s', err.e);
+        } else if (err && err.e !== null) {
+          log.error('domain %s, async foreach error %s',
+                    DiceParser._domain,
+                    err.e);
           return reject(e);
         } else {
-          log.info('async foreach complete, no match for doc id %s', this.doc_id);
+          log.info('domain %s, async foreach complete, no match for doc id %s',
+                   DiceParser._domain,
+                   this._doc_id);
           return resolve(false);
         }
       }); //end of async each

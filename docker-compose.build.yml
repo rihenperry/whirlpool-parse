@@ -16,6 +16,7 @@ services:
     working_dir: /home/whirlpool/whirlpool-parse
     environment:
       - NODE_ENV=development
+      - CRAWL_ORDER_MAX_LIM=5
     networks:
       - default
 

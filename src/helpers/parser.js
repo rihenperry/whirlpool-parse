@@ -35,7 +35,7 @@ class DocParser {
       } else {
         log.warn('doc %s doest not match parser %s ', this.parser._doc_id, this._domain);
         this.dropHTML();
-        return [];
+        return null;
       }
     } catch (e) {
       log.error(e);
@@ -48,8 +48,9 @@ class DocParser {
   dropHTML() {
     let self = this;
     log.warn('dropping doc %s, domain %s', this.parser._doc_id, this._domain);
-    DocParser.db.deleteOne({_id: self.parser.doc_id}, function (err) {
-      log.error('doc %s unable to delete %s', self.parser._doc_id, util.inspect(err));
+    DocParser.db.deleteOne({_id: mongoose.Types.ObjectId(self.parser._doc_id)}, function (err) {
+      if (err) log.error('doc %s unable to delete %s', self.parser._doc_id, util.inspect(err));
+      log.info('doc %s deleted', self.parser._doc_id);
     });
   }
 }
