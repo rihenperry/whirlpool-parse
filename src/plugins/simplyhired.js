@@ -24,10 +24,8 @@ class SimplyHiredParser {
           matchTest.push($('#content').hasClass('content'));
           matchTest.push($('#content .container .categories').children().first().hasClass('letter-line'));
           matchTest.push($('#content .container .categories').children().first().children().length === 28);
-          matchTest.push($('#content .container .categories').children().first().children().first().next().next().hasClass('selected'));
 
           matchTest.push($('#content .container').children().last().hasClass('item-list'));
-          matchTest.push($('#content .container').children().last().children().length === 60);
           matchTest.push($('#content .container')
                          .children()
                          .last()
@@ -50,7 +48,7 @@ class SimplyHiredParser {
           matchTest.push($('#content .wrap .TwoPane .TwoPane-paneHolder .LeftPane .LeftPane-bottom')
                          .hasClass('LeftPane-bottom'));
           matchTest.push($('#content .wrap .TwoPane .TwoPane-paneHolder .LeftPane .LeftPane-bottom')
-                         .children().first().next().next().hasClass('Pagination'));
+                         .children().first().next().hasClass('Pagination'));
 
           log.debug('domain %s, mtitle %s', SimplyHiredParser._domain, matchTest);
           resolve({
@@ -73,6 +71,8 @@ class SimplyHiredParser {
         });
       }
     ];
+
+    return s;
   }
 
   static _xpSet(act) {
@@ -125,7 +125,7 @@ class SimplyHiredParser {
           });
 
           const pagination = $('#content .wrap .TwoPane .TwoPane-paneHolder .LeftPane .LeftPane-bottom')
-                .children().first().next().next().children().first().children();
+                .children().first().next().children().first().children();
 
           pagination.each((i, e) => {
             let url_rank = Math.ceil(Math.random() * 3) + 1;
