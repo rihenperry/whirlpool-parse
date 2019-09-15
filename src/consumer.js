@@ -9,6 +9,7 @@ import {parserPublish as publish} from './publish';
 import DocParser from './helpers/parser.js';
 
 const log = logger(module);
+const K = 10000;
 //const writeFile = util.promisify(fs.writeFile);
 
 
@@ -40,11 +41,21 @@ export const parserConsume = async function ({rmqConn, consumeChannel, publishCh
               // publish to next exchange in the chain for further processing
 			        // publish, ack method do not return a promise
               // publish to content seen q. stick to the format below
+              let polDelay = Date.now();
 
               if (!_.isEmpty(hrefs)) {
                 _.each(hrefs, (v, k) => {
                   if (!_.isEmpty(hrefs[k])) {
                     c += hrefs[k].length;
+
+                    const newHrefs = hrefs[k].map(el => {
+                      polDelay += (K * pgFromQ.ltsInMS);
+
+                      el.ttcrawl = polDelay; // politeness delay
+                      return el;
+                    });
+
+                    hrefs[k] = newHrefs;
                   }
                 });
 
