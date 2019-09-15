@@ -1,5 +1,6 @@
 import DiceParser from '../plugins/dice';
 import SimplyHiredParser from '../plugins/simplyhired.js';
+import MonsterJobsParser from '../plugins/monster.js';
 
 const injector = {
   deps: {},
@@ -13,5 +14,8 @@ const injector = {
 
 injector.register(DiceParser._domain, DiceParser);
 injector.register(SimplyHiredParser._domain, SimplyHiredParser);
+injector.register(SimplyHiredParser._domain, SimplyHiredParser);
+injector.register(MonsterJobsParser._domain, MonsterJobsParser);
+injector.register(MonsterJobsParser._otherdomain, MonsterJobsParser);
 
 export default injector;
