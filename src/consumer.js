@@ -24,6 +24,7 @@ export const parserConsume = async function ({rmqConn, consumeChannel, publishCh
 
       queryHTMLDoc.exec(async (err, page) => {
         if (err) {
+          await consumeChannel.ack(msg);
           return reject(err);
         } else if (page && page.html.length !== 0) {
           log.info('domain %s, parsing doc %s', page.domain, page._id);
@@ -83,9 +84,11 @@ export const parserConsume = async function ({rmqConn, consumeChannel, publishCh
 				    resolve('processed single message with durable confirmation');
 			    }
 			    catch (e) {
+            await consumeChannel.ack(msg);
 				    return reject(e);
 			    } //end of try/catch
         } else {
+          await consumeChannel.ack(msg);
           log.warn('page %s not found...', pgFromQ._id);
           //HTMLMetaDB.deleteOne({_id: pgFromQ._id}, function (err) {
           //  log.error('doc %s unable to delete %s', pgFromQ._id, util.inspect(err));
