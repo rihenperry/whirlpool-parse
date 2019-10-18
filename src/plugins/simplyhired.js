@@ -90,7 +90,7 @@ class SimplyHiredParser {
 
           letterTitles.each((i, e) => {
             let url_rank = Math.ceil(Math.random() * 3) + 1;
-            letterAndJobTitleHrefs[url_rank].push({'href': $(e).attr('href'), 'type': 'nc'});
+            letterAndJobTitleHrefs[url_rank].push({'url': $(e).attr('href'), 'type': 'nc'});
           });
 
           let jobtitles = $('#content .container').children().last().children();
@@ -98,7 +98,7 @@ class SimplyHiredParser {
           jobtitles.each((i, e) => {
             let url_rank = Math.ceil(Math.random() * 3) + 1;
             letterAndJobTitleHrefs[url_rank].push({
-              'href': $(e).children().first().attr('href'),
+              'url': $(e).children().first().attr('href'),
               'type': 'c'
             });
           });
@@ -119,7 +119,7 @@ class SimplyHiredParser {
           jobTitles.each((i, e) => {
             let url_rank = Math.ceil(Math.random() * 2);
             jobHrefs[url_rank].push({
-              'href': $(e).children().first().children().first().children().first().attr('href'),
+              'url': $(e).children().first().children().first().children().first().attr('href'),
               'type': 'nc'
             });
           });
@@ -132,7 +132,7 @@ class SimplyHiredParser {
 
             if ($(e).children().first().attr('href') !== undefined) {
               jobHrefs[url_rank].push({
-                'href': $(e).children().first().attr('href'),
+                'url': $(e).children().first().attr('href'),
                 'type': 'c'
               });
             }

@@ -35,6 +35,7 @@ export const parserConsume = async function ({rmqConn, consumeChannel, publishCh
           // makes use of cherrios, puppeteer, and axios/request modules
           try {
             const webparser = new DocParser(page.domain, page._id, page.html);
+            let msgPayLoadContents = new Object({origin: new URL(page.url).origin});
             const hrefs = await webparser.parseHTML();
             let c = 0;
 
@@ -61,8 +62,9 @@ export const parserConsume = async function ({rmqConn, consumeChannel, publishCh
                 });
 
                 // publish to urlfilter q. stick to the format below
+                msgPayLoadContents.hrefs = hrefs;
                 const urlfilterAckPublish = await publish(publishChannel,
-                                                          hrefs,
+                                                          msgPayLoadContents,
                                                           'parser_p.to.urlfilter_c',
                                                           'parser.ex.contentseen');
 				        log.info('parser_p published results of work done by parser_c to urlfilter_c',

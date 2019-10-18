@@ -102,7 +102,7 @@ class DiceParser {
               //randomly assign rank function
               let url_rank = Math.ceil(Math.random() * parseInt(process.env.CRAWL_ORDER_MAX_LIM));
               let href = $(subelm).children().first().attr('href');
-              jobhrefs[url_rank].push({'href': href, 'type': 'c'});
+              jobhrefs[url_rank].push({'url': href, 'type': 'c'});
             });
           });
 
@@ -122,14 +122,14 @@ class DiceParser {
                 .children().first().children().last().children();
 
           pagination.each((i, e) => {
-            jobOpeningHrefs[2].push({'href': $(e).children().attr('href'), 'type': 'c'});
+            jobOpeningHrefs[2].push({'url': $(e).children().attr('href'), 'type': 'c'});
           });
 
           for (let i=0; i<jobopenings; i++) {
             let id = '#position'.concat(i);
             let url_rank = Math.ceil(Math.random() * 2);
             let href = $(id).attr('href');
-            jobOpeningHrefs[url_rank].push({'href': href, 'type': 'nc'});
+            jobOpeningHrefs[url_rank].push({'url': href, 'type': 'nc'});
           }
 
           resolve(jobOpeningHrefs);
@@ -139,7 +139,7 @@ class DiceParser {
         return new Promise((resolve, reject) => {
           let comHrefs = {'5': []};
 
-          let obj = {'href': $('#jt').next().children().first().children().first().attr('href'),
+          let obj = {'url': $('#jt').next().children().first().children().first().attr('href'),
                      type: 'nc'};
           comHrefs['5'].push(obj);
 

@@ -115,7 +115,7 @@ class MonsterJobsParser {
 
           browse.each((i, e) => {
             let url_rank = Math.ceil(Math.random() * 4) + 1;
-            browsehrefs[url_rank].push({'href': $(e).children().first().attr('href'), 'type': 'nc'});
+            browsehrefs[url_rank].push({'url': $(e).children().first().attr('href'), 'type': 'nc'});
           });
 
           resolve(browsehrefs);
@@ -135,7 +135,7 @@ class MonsterJobsParser {
           browseCats.each((i, e) => {
             let url_rank = Math.ceil(Math.random() * 3) + 1;
             browseCatsHrefs[url_rank].push({
-              'href': $(e).children().last().attr('href'),
+              'url': $(e).children().last().attr('href'),
               'type': 'c'
             });
 
@@ -153,7 +153,7 @@ class MonsterJobsParser {
           }
 
           jobTitlesHrefs[3].push({
-            'href': $('#mainContent .row #ResultsContainer #ResultsScrollable .mux-search-results')
+            'url': $('#mainContent .row #ResultsContainer #ResultsScrollable .mux-search-results')
               .children()
               .last()
               .attr('href'),
@@ -165,7 +165,7 @@ class MonsterJobsParser {
           jobTitles.each((i, e) => {
             let url_rank = Math.ceil(Math.random() * 2);
             jobTitlesHrefs[url_rank].push({
-              'href': $(e).find($('.flex-row .summary .card-header .title'))
+              'url': $(e).find($('.flex-row .summary .card-header .title'))
                 .children()
                 .first()
                 .attr('href'),
